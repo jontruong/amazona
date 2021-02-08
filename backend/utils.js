@@ -10,3 +10,21 @@ export const generateToken = (user) => {
         process.env.JWT_SECRET || 'PROJECTAMAZONA',
         { expiresIn: '30d', });
 };
+
+export const isAuth = (req, res, next) => {
+    const authorization = req.headers.authorization;
+    if (authorization) {
+        const token = authorization.slice(7, authorization.length); //Bearer xxxxxx
+        jwt.verify(token, process.env.JWT_SECRET || 'PROJECTAMAZON', (err, decode) => {
+            if (err) {
+                res.status(401).send({ message: 'Invalid Token' });
+            } else {
+                req.user = decode;
+                next();
+            }
+        }
+        );
+    } else {
+        res.status(404).send({ message: 'Invalid Token' });
+    }
+}
